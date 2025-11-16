@@ -1,7 +1,6 @@
 #######################################
 # Terraform Backend Configuration (S3)
 #######################################
-
 terraform {
   backend "s3" {
     bucket = "terraform-project1-state-pavithra"
@@ -33,7 +32,18 @@ resource "aws_instance" "windows_ec2" {
   instance_type = "t3.micro"
   key_name      = "Lab_env_Windows"
 
-  user_data = file("${path.module}/scripts/install_windows_tools.ps1")
+  # Windows requires <powershell> wrapper
+  user_data = <<-EOF
+<powershell>
+Set-ExecutionPolicy Bypass -Scope Process -Force
+
+# Download your actual installer script into the instance
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/Cloudlightcorp/ec2-setup-scripts/main/scripts/install_windows_tools.ps1" -OutFile "C:\\install_windows_tools.ps1"
+
+# Execute it
+powershell.exe -ExecutionPolicy Bypass -File "C:\\install_windows_tools.ps1"
+</powershell>
+EOF
 
   tags = {
     Name      = "lab-env-ec2-windows-${count.index + 1}"
