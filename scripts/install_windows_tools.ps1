@@ -1,45 +1,29 @@
-<powershell>
+# Allow running scripts
+Set-ExecutionPolicy Bypass -Scope Process -Force
 
-# Logging
-Start-Transcript -Path "C:\install_log.txt"
+[System.Net.ServicePointManager]::SecurityProtocol = 'Tls12'
 
-Write-Host "Installing Windows tools..."
+# Install Chocolatey
+if (-not (Get-Command choco.exe -ErrorAction SilentlyContinue)) {
+    Write-Output "Installing Chocolatey..."
+    Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+} else {
+    Write-Output "Chocolatey already installed."
+}
 
-# Install winget (preinstalled usually)
-Invoke-WebRequest -Uri https://aka.ms/getwinget -OutFile "winget.msixbundle"
-Add-AppxPackage -Path "winget.msixbundle"
+# Install tools
+choco install git -y
+choco install python -y
+choco install nodejs -y
+choco install dotnet-sdk -y
+choco install openjdk17 -y
 
-# Install Git
-winget install --id Git.Git -e --source winget -h
+# Save versions
+$versionInfo = @()
+$versionInfo += "Git: $(git --version)"
+$versionInfo += "Python: $(python --version)"
+$versionInfo += "Node: $(node -v)"
+$versionInfo += ".NET: $(dotnet --version)"
+$versionInfo += "Java: $(java -version 2>&1)"
 
-# Install Java 17 (Temurin)
-winget install --id EclipseAdoptium.Temurin.17.JDK -e --source winget -h
-
-# Install Node.js LTS
-winget install --id OpenJS.NodeJS.LTS -e --source winget -h
-
-# Install Python 3.9
-winget install --id Python.Python.3.9 -e --source winget -h
-
-# Install .NET SDK
-winget install --id Microsoft.DotNet.SDK.6 -e --source winget -h
-
-# Install Google Chrome
-winget install --id Google.Chrome -e --source winget -h
-
-# Install VS Code
-winget install --id Microsoft.VisualStudioCode -e --source winget -h
-
-Write-Host "Writing versions to file..."
-$versions = @"
-Git: $(git --version)
-Java: $(java --version)
-Node: $(node --version)
-Python: $(python --version)
-DotNet: $(dotnet --version)
-"@
-
-Set-Content -Path "C:\installed_versions.txt" -Value $versions
-
-Stop-Transcript
-</powershell>
+Set-Content -Path "C:\installed_versions.txt" -Value $versionInfo
