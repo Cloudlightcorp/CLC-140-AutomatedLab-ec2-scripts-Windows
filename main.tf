@@ -31,7 +31,7 @@ resource "aws_instance" "windows_ec2" {
   count         = 2
   ami           = "ami-0c70d556495b25a90"
   instance_type = "t3.micro"
-  key_name      = "project_1"
+  key_name      = "Lab_env_Windows"
 
   user_data = file("${path.module}/scripts/install_windows_tools.ps1")
 
