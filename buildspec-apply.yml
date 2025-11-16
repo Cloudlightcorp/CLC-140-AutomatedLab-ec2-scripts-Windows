@@ -22,13 +22,13 @@ phases:
       - INSTANCE_IDS=$(terraform output -json windows_instance_ids | jq -r '.[]')
       - echo "Instances: $INSTANCE_IDS"
 
-      - echo "Downloading script from repo..."
+      - echo "Copying install script locally..."
       - cp scripts/install_windows_tools.ps1 install_windows_tools.ps1
 
-      - echo "Uploading install script to S3..."
+      - echo "Uploading script to S3..."
       - aws s3 cp install_windows_tools.ps1 s3://terraform-project1-state-pavithra/windows/install_windows_tools.ps1
 
-      - echo "Sending SSM install command..."
+      - echo "Sending SSM installation command..."
       - |
         for ID in $INSTANCE_IDS; do
           aws ssm send-command \
