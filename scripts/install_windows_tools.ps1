@@ -1,29 +1,35 @@
-# Allow running scripts
+<powershell>
+
+Start-Transcript -Path "C:\install_log.txt"
+
+Write-Output "📌 Installing Chocolatey..."
 Set-ExecutionPolicy Bypass -Scope Process -Force
+[System.Net.ServicePointManager]::SecurityProtocol = "tls12, tls11, tls"
+Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Environment' -Name PATH -Value $env:PATH
+Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 
-[System.Net.ServicePointManager]::SecurityProtocol = 'Tls12'
-
-# Install Chocolatey
-if (-not (Get-Command choco.exe -ErrorAction SilentlyContinue)) {
-    Write-Output "Installing Chocolatey..."
-    Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-} else {
-    Write-Output "Chocolatey already installed."
-}
-
-# Install tools
+Write-Output "📌 Installing Git..."
 choco install git -y
-choco install python -y
+
+Write-Output "📌 Installing Node.js..."
 choco install nodejs -y
-choco install dotnet-sdk -y
-choco install openjdk17 -y
 
-# Save versions
-$versionInfo = @()
-$versionInfo += "Git: $(git --version)"
-$versionInfo += "Python: $(python --version)"
-$versionInfo += "Node: $(node -v)"
-$versionInfo += ".NET: $(dotnet --version)"
-$versionInfo += "Java: $(java -version 2>&1)"
+Write-Output "📌 Installing Python..."
+choco install python -y
 
-Set-Content -Path "C:\installed_versions.txt" -Value $versionInfo
+Write-Output "📌 Installing JDK 17..."
+choco install microsoft-openjdk17 -y
+
+Write-Output "📌 Installing Visual Studio Code..."
+choco install vscode -y
+
+Write-Output "📌 Installing .NET 6 SDK..."
+choco install dotnet-6.0-sdk -y
+
+Write-Output "📌 Installing Postman..."
+choco install postman -y
+
+Write-Output "📌 DONE — all tools installed."
+
+Stop-Transcript
+</powershell>
