@@ -29,7 +29,7 @@ provider "aws" {
 resource "aws_instance" "windows_ec2" {
   count         = 2
   ami           = "ami-0c70d556495b25a90"
-  instance_type = "t3.xlarge"
+  instance_type = "t3.large"
   key_name      = "Lab_env_Windows"
 
   # User data to install apps
