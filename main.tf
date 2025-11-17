@@ -3,7 +3,7 @@
 ###########################################
 terraform {
   backend "s3" {
-    bucket = "terraform-project1-state-pavithra"
+    bucket = "automated-lab-ec2-instances"
     key    = "windows-ec2-project/terraform.tfstate"
     region = "us-west-2"
   }
